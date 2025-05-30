@@ -4,10 +4,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { WarningIcon } from '@phosphor-icons/react'
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createLink } from "../api/create-link";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
+import { type GetAllLinksResponse } from "../api/get-all-links";
 
 const createLinkForm = z.object({
     originalURL: z.string().url(),
@@ -17,6 +18,8 @@ const createLinkForm = z.object({
 type CreateLinkForm = z.infer<typeof createLinkForm>
 
 export function InputBox(){
+    const queryClient = useQueryClient()
+
     const [isOriginalURLInputEmpty, setIsOriginalURLInputEmpty] = useState(true)
     const [isShortURLInputEmpty, setIsShortURLInputEmpty] = useState(true)
 
@@ -27,7 +30,34 @@ export function InputBox(){
     })
 
     const { mutateAsync: createLinkFn } = useMutation({
-        mutationFn: createLink
+        mutationFn: createLink,
+        onSuccess(_, {
+            originalURL,
+            shortURL
+        }) {
+            const cached = queryClient.getQueryData(['links']) as GetAllLinksResponse
+
+            if (cached){ 
+                const newLink = {
+                    id: shortURL,
+                    originalURL,
+                    shortURL,
+                    accessCount: 0,
+                    createdAt: new Date()
+                } as {
+                    id: string
+                    originalURL: string
+                    shortURL: string
+                    accessCount: number
+                    createdAt: Date
+                }
+
+                queryClient.setQueryData(['links'], {
+                    ...cached,
+                    links: [...cached.links, newLink]
+                })
+            }
+        }
     })
 
     async function handleCreateLink(data: CreateLinkForm){
