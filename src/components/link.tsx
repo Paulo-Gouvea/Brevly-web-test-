@@ -6,12 +6,14 @@ export interface LinkProps {
     shortURL: string
     originalURL: string
     accessCount: number
+    handleDelete: (url: string) => void
 }
 
 export function Link({
     shortURL,
     originalURL,
-    accessCount
+    accessCount,
+    handleDelete
 }: LinkProps){
     return(
         <>
@@ -32,6 +34,7 @@ export function Link({
 
                             <IconButton
                                 icon={TrashIcon}
+                                onClick={() => handleDelete(shortURL)}
                             />
                         </div>
                     </div>
