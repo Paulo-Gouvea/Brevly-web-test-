@@ -1,4 +1,4 @@
-import { Link as LinkIcon } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { IconButton } from "./icon-button";
 import { CopyIcon, TrashIcon } from "@phosphor-icons/react";
 
@@ -7,20 +7,38 @@ export interface LinkProps {
     originalURL: string
     accessCount: number
     handleDelete: (url: string) => void
+    onVisit: () => void
 }
 
 export function CustomLink({
     shortURL,
     originalURL,
     accessCount,
-    handleDelete
+    handleDelete,
+    onVisit
 }: LinkProps){
+    const navigate = useNavigate()
+
+    const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault(); 
+
+        if (onVisit) {
+            try {
+                await onVisit(); 
+            } catch (err) {
+                console.error("Erro ao atualizar acessos:", err);
+            }
+        }
+
+        navigate('redirect'); 
+    };
+
     return(
         <>
             <div>
                 <div className="flex items-center justify-between">
                     <div>
-                        <LinkIcon to={originalURL} className="text-blue-base text-Text-md font-Text-md">{`brev.ly/${shortURL}`}</LinkIcon>
+                        <a href={originalURL} onClick={handleClick} className="text-blue-base text-Text-md font-Text-md">{`brev.ly/${shortURL}`}</a>
                         <p className="text-gray-500 text-Text-sm font-Text-sm">{originalURL?.slice(8)}</p>
                     </div>
 

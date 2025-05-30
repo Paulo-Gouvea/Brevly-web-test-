@@ -7,6 +7,7 @@ import { deleteLink } from "../api/delete-link";
 import { queryClient } from "../libs/react-query";
 import type { AxiosError } from "axios";
 import { exportLinks } from "../api/export-links";
+import { updateAccessCount } from "../api/update-access-count";
 
 export function LinkBox(){
     const { data: links } = useQuery({
@@ -32,6 +33,32 @@ export function LinkBox(){
         }
     })
 
+    const { mutateAsync: updateAccessCountFn } = useMutation({
+        mutationFn: updateAccessCount,
+        onSuccess(_, variables) {
+        const { shortURL } = variables
+
+        const cached = queryClient.getQueryData(['links']) as GetAllLinksResponse
+
+        if (cached) {
+            const updatedLinkList = cached.links.map((element) => {
+                if (element.shortURL === shortURL) {
+                    return {
+                        ...element,
+                        accessCount: element.accessCount + 1,
+                    }
+                }
+                return element
+            })
+
+        queryClient.setQueryData(['links'], {
+            ...cached,
+            links: updatedLinkList,
+        })
+    }
+}
+    })
+
     const exportMutation = useMutation({
         mutationFn: exportLinks,
         onSuccess(data, _, __) {
@@ -55,6 +82,10 @@ export function LinkBox(){
         }
     }
 
+    async function handleLinkClick(url: string){
+        await updateAccessCountFn({ shortURL: url });
+    }
+
     return (
         <div className="w-[55%] min-h-[234px] max-h-[552px] overflow-y-auto rounded-md bg-white max-md:w-[100%] max-md:min-h-[214px] max-md:max-h-[348px] max-md:p-[24px] p-[32px]">
             <header className="w-[100%] flex items-center justify-between">
@@ -74,6 +105,7 @@ export function LinkBox(){
                             originalURL={element.originalURL}
                             accessCount={element.accessCount}
                             handleDelete={() => handleDeleteLink(element.shortURL)}
+                            onVisit={() => handleLinkClick(element.shortURL)}
                         />
                     )
                 })

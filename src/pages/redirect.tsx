@@ -2,7 +2,7 @@ import { Notification } from "../components/notification";
 import Logo from '../assets/icon.svg'
 import { Link } from "react-router-dom";
 
-// DEIXAR O LINK DINAMICO !!!!!!!!!!
+
 
 export function Redirect() {
     return (
