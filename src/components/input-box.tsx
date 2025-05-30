@@ -4,10 +4,14 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { WarningIcon } from '@phosphor-icons/react'
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { createLink } from "../api/create-link";
+import { toast } from "sonner";
+import type { AxiosError } from "axios";
 
 const createLinkForm = z.object({
     originalURL: z.string().url(),
-    shortURL: z.string().url(),
+    shortURL: z.string(),
 })
 
 type CreateLinkForm = z.infer<typeof createLinkForm>
@@ -22,9 +26,11 @@ export function InputBox(){
         }
     })
 
-    async function handleCreateLink(data: CreateLinkForm){
-        console.log(data)
+    const { mutateAsync: createLinkFn } = useMutation({
+        mutationFn: createLink
+    })
 
+    async function handleCreateLink(data: CreateLinkForm){
         if(data.originalURL === '' || !data.originalURL.startsWith('https://') || !data.originalURL.includes('com')){
             setIsOriginalURLInputEmpty(false);
         } else {
@@ -35,6 +41,27 @@ export function InputBox(){
             setIsShortURLInputEmpty(false);
         } else {
             setIsShortURLInputEmpty(true);
+        }
+
+        if(!isOriginalURLInputEmpty || !isShortURLInputEmpty) {
+            return
+        }
+
+        const formattedShortURL = data.shortURL.slice(8)
+
+        try {
+            await createLinkFn({
+            originalURL: data.originalURL,
+            shortURL: formattedShortURL
+        })
+        } catch (err) {
+            const error = err as AxiosError
+
+            if(error.status === 409){
+                toast.error('Erro no cadastro', {
+                    description: 'Essa URL encurtada já existe.'
+                })
+            }
         }
     }
 
