@@ -9,7 +9,7 @@ export interface LinkProps {
     handleDelete: (url: string) => void
 }
 
-export function Link({
+export function CustomLink({
     shortURL,
     originalURL,
     accessCount,

@@ -1,6 +1,6 @@
 import { ExportCsvButton } from "./export-csv-button";
 import { NoLinksContainer } from "./no-links-container";
-import { Link } from "./link";
+import { CustomLink } from "./custom-link";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getAllLinks, type GetAllLinksResponse } from "../api/get-all-links";
 import { deleteLink } from "../api/delete-link";
@@ -58,7 +58,7 @@ export function LinkBox(){
             {
                 links?.links.length === 0 ? <NoLinksContainer /> : links?.links.map((element) => {
                     return (
-                        <Link 
+                        <CustomLink 
                             key={element.id}
                             shortURL={element.shortURL}
                             originalURL={element.originalURL}
