@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { IconButton } from "./icon-button";
 import { CopyIcon, TrashIcon } from "@phosphor-icons/react";
 
@@ -17,8 +16,6 @@ export function CustomLink({
     handleDelete,
     onVisit
 }: LinkProps){
-    const navigate = useNavigate()
-
     const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault(); 
 
@@ -30,7 +27,7 @@ export function CustomLink({
             }
         }
 
-        navigate('redirect'); 
+        window.open(`/${shortURL}`, '_blank');
     };
 
     return(

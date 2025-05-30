@@ -5,6 +5,6 @@ import { NotFound } from "./pages/not-found"
 
 export const router = createBrowserRouter([
     { path: '/', element: <Home /> },
-    { path: '/redirect', element: <Redirect /> },
+    { path: '/:tipo', element: <Redirect /> },
     { path: '*', element: <NotFound /> },
 ])
