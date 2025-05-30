@@ -6,6 +6,7 @@ import { getAllLinks, type GetAllLinksResponse } from "../api/get-all-links";
 import { deleteLink } from "../api/delete-link";
 import { queryClient } from "../libs/react-query";
 import type { AxiosError } from "axios";
+import { exportLinks } from "../api/export-links";
 
 export function LinkBox(){
     const { data: links } = useQuery({
@@ -31,6 +32,15 @@ export function LinkBox(){
         }
     })
 
+    const exportMutation = useMutation({
+        mutationFn: exportLinks,
+        onSuccess(data, _, __) {
+            if(data?.reportUrl){
+                window.open(data.reportUrl, '_blank');
+            }
+        },
+    });
+
     async function handleDeleteLink(url: string){
         try {
             await deleteLinkFn({
@@ -50,7 +60,7 @@ export function LinkBox(){
             <header className="w-[100%] flex items-center justify-between">
                 <h1 className="text-gray-600 text-Text-lg font-Text-lg">Meus links</h1>
 
-                <ExportCsvButton />
+                <ExportCsvButton onClick={() => exportMutation.mutate()}/>
             </header>
 
             <div className="w-[100%] h-[1px] bg-gray-200 my-[16px]" />
