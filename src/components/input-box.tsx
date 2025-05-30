@@ -1,30 +1,88 @@
 import { Button } from "./button";
 import { Input } from "./input";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { WarningIcon } from '@phosphor-icons/react'
+import { useState } from "react";
+
+const createLinkForm = z.object({
+    originalURL: z.string().url(),
+    shortURL: z.string().url(),
+})
+
+type CreateLinkForm = z.infer<typeof createLinkForm>
 
 export function InputBox(){
+    const [isOriginalURLInputEmpty, setIsOriginalURLInputEmpty] = useState(true)
+    const [isShortURLInputEmpty, setIsShortURLInputEmpty] = useState(true)
+
+    const { register, handleSubmit } = useForm<CreateLinkForm>({
+        defaultValues: {
+            shortURL: "brev.ly/"
+        }
+    })
+
+    async function handleCreateLink(data: CreateLinkForm){
+        console.log(data)
+
+        if(data.originalURL === '' || !data.originalURL.startsWith('https://') || !data.originalURL.includes('com')){
+            setIsOriginalURLInputEmpty(false);
+        } else {
+            setIsOriginalURLInputEmpty(true);
+        }
+
+        if(data.shortURL === 'brev.ly/'){
+            setIsShortURLInputEmpty(false);
+        } else {
+            setIsShortURLInputEmpty(true);
+        }
+    }
+
     return (
         <div className="w-[40%] h-[380px] rounded-md bg-white max-md:w-[100%] max-md:h-[316px] max-md:mb-[12px] max-md:p-[24px] p-[32px]">
             <h1 className="text-gray-600 text-Text-lg font-Text-lg">Novo link</h1>
 
-            <div className="max-md:w-[100%] max-md:h-[156px] max-md:my-[20px] my-[32px] flex flex-col justify-between">
-                <div>
-                    <Input
-                        title="LINK ORIGINAL"
-                        placeholder="www.exemplo.com.br"
-                    />
+            <form onSubmit={handleSubmit(handleCreateLink)}>
+                <div className="max-md:w-[100%] max-md:h-[156px] max-md:my-[20px] my-[32px] flex flex-col justify-between">
+                    <div>
+                        <Input
+                            title="LINK ORIGINAL"
+                            placeholder="www.exemplo.com.br"
+                            {...register('originalURL')}
+                        />
+
+                        {
+                            !isOriginalURLInputEmpty && (
+                                <div className="flex items-center mt-[5px]">
+                                    <WarningIcon className="text-danger" />
+                                    <p className="text-gray-500 text-Text-xs font-Text-xs ml-[7px]" >Informe uma url válida.</p>
+                                </div>
+                            )
+                        }
+                    </div>
+
+                    <div className="mt-[8px]">
+                        <Input
+                            title="LINK ENCURTADO"
+                            placeholder="brev.ly/"
+                            {...register('shortURL')}
+                        />
+
+                        {
+                            !isShortURLInputEmpty && (
+                                <div className="flex items-center mt-[5px]">
+                                    <WarningIcon className="text-danger" />
+                                    <p className="text-gray-500 text-Text-xs font-Text-xs ml-[7px]" >Informe uma url minúscula e sem espaço/caracter especial.</p>
+                                </div>  
+                            )
+                        }
+                    </div>
                 </div>
 
-                <div className="mt-[8px]">
-                    <Input
-                        title="LINK ENCURTADO"
-                        placeholder="brev.ly/"
-                    />
-                </div>
-            </div>
-
-            <Button
-                title="Salvar link"
-            />
+                <Button
+                    title="Salvar link"
+                />
+            </form>
         </div>
     )
 }
