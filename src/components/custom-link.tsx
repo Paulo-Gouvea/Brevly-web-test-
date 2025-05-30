@@ -42,7 +42,7 @@ export function CustomLink({
                     </div>
 
                     <div className="text-gray-500 text-Text-sm font-Text-sm flex">
-                        <p className="flex items-center mr-[15px]">{`${accessCount} acessos`}</p>
+                        <p className="flex items-center mr-[15px]">{`${accessCount} ${accessCount === 1 ? 'acesso' : 'acessos'} `}</p>
 
                         <div className="w-[67px] flex justify-between">
                             <IconButton
