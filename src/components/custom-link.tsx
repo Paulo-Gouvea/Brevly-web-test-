@@ -6,6 +6,7 @@ export interface LinkProps {
     originalURL: string
     accessCount: number
     handleDelete: (url: string) => void
+    handleCopy: (shortUrl: string) => void
     onVisit: () => void
 }
 
@@ -14,6 +15,7 @@ export function CustomLink({
     originalURL,
     accessCount,
     handleDelete,
+    handleCopy,
     onVisit
 }: LinkProps){
     const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -45,6 +47,7 @@ export function CustomLink({
                         <div className="w-[67px] flex justify-between">
                             <IconButton
                                 icon={CopyIcon}
+                                onClick={() => handleCopy(shortURL)}
                             />
 
                             <IconButton

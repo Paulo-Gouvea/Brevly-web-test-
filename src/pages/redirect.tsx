@@ -46,7 +46,7 @@ export function Redirect() {
             <br />
             Não foi redirecionado?{" "}
             <span className="text-blue-base">
-              <Link to="/">Acesse aqui</Link>
+              <Link to={`${originalURL?.originalURL}`}>Acesse aqui</Link>
             </span>
           </>
         }

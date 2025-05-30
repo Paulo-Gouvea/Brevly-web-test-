@@ -8,6 +8,8 @@ import { queryClient } from "../libs/react-query";
 import type { AxiosError } from "axios";
 import { exportLinks } from "../api/export-links";
 import { updateAccessCount } from "../api/update-access-count";
+import { toast } from "sonner";
+import { env } from "../env";
 
 export function LinkBox(){
     const { data: links } = useQuery({
@@ -68,6 +70,17 @@ export function LinkBox(){
         },
     });
 
+    async function handleCopy(shortURL: string){
+        try {
+            await navigator.clipboard.writeText(`${env.VITE_FRONTEND_URL}${shortURL}`)
+            toast.info('Link copiado com sucesso', {
+                description: `O link ${shortURL} foi copiado para a área de transferência.`
+            })
+        } catch {
+            console.error('erro em copiar o link')
+        }
+    }
+
     async function handleDeleteLink(url: string){
         try {
             await deleteLinkFn({
@@ -106,6 +119,7 @@ export function LinkBox(){
                             accessCount={element.accessCount}
                             handleDelete={() => handleDeleteLink(element.shortURL)}
                             onVisit={() => handleLinkClick(element.shortURL)}
+                            handleCopy={() => handleCopy(element.shortURL)}
                         />
                     )
                 })
